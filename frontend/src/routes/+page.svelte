@@ -5,7 +5,7 @@
   let suggestions = [];
 
   onMount(async () => {
-    const res = await fetch('/prompts.extended 2.json');
+    const res = await fetch('/prompts');
     suggestions = await res.json();
   });
 
