@@ -55,6 +55,18 @@ def save_fallback(logline: dict) -> None:
         f.write(json.dumps(logline) + '\n')
 
 
+def load_events():
+    if not FALLBACK_PATH.exists():
+        return []
+    with FALLBACK_PATH.open('r') as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+def save_events(events):
+    with FALLBACK_PATH.open('w') as f:
+        for ev in events:
+            f.write(json.dumps(ev) + '\n')
+
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -105,6 +117,22 @@ def timeline():
             entries = [json.loads(line) for line in f if line.strip()]
         return jsonify(entries)
     return jsonify([])
+
+
+@app.route('/sync', methods=['POST'])
+def sync():
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return jsonify({'error': 'Supabase not configured'}), 500
+    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    events = load_events()
+    remaining = []
+    for ev in events:
+        try:
+            client.table('loglines').insert(ev).execute()
+        except Exception:
+            remaining.append(ev)
+    save_events(remaining)
+    return jsonify({'synchronized': len(events) - len(remaining), 'remaining': len(remaining)})
 
 
 if __name__ == '__main__':
