@@ -1,0 +1,2 @@
+{"who":"alice","did":"report","this":"teste","when":"2023-01-01","confirmed_by":"bob","if_ok":"ok","if_doubt":"doubt","if_not":"fail","status":"pending","valid":true}
+{"who":"carol","did":"fail","this":"error","when":"2023-01-02","confirmed_by":"","if_ok":"","if_doubt":"","if_not":"notify","status":"pending","valid":false}

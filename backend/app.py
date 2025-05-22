@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from .llm_service import parse_text_to_logline
+from .llm_service import parse_text_to_logline, interpretar_frase
 
 load_dotenv()
 app = Flask(__name__)
@@ -35,10 +35,10 @@ def register():
         text = request.data.decode('utf-8')
         if not text:
             return jsonify({'error': 'No data provided'}), 400
-        logline = parse_text_to_logline(text)
+        logline = interpretar_frase(text)
     else:
         if isinstance(data, str):
-            logline = parse_text_to_logline(data)
+            logline = interpretar_frase(data)
         else:
             logline = data
 
