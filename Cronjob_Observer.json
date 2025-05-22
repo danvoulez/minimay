@@ -1,0 +1,6 @@
+{
+  "schedule": "0 0 * * *",
+  "action": "agent.15.generate_questions",
+  "target": "ghosts com mais de 2 dias",
+  "fallback": "notificar_gestor"
+}

@@ -1,0 +1,41 @@
+{
+  "template_id": "llm_executor_v1",
+  "description": "Modelo para a\u00e7\u00f5es sem\u00e2nticas de LLM",
+  "fields": {
+    "who": {
+      "type": "string",
+      "default": "llm.dispatcher",
+      "required": true
+    },
+    "did": {
+      "type": "string",
+      "options": [
+        "interpret_intent",
+        "generate_question"
+      ],
+      "required": true
+    },
+    "this": {
+      "type": "string",
+      "description": "Objeto da a\u00e7\u00e3o"
+    },
+    "confirmed_by": {
+      "type": "string",
+      "default": "ruleset.intent_default"
+    },
+    "status": {
+      "type": "string",
+      "options": [
+        "executed",
+        "ghost",
+        "denied"
+      ],
+      "required": true
+    }
+  },
+  "rules": {
+    "if_ok": "Registrar a\u00e7\u00e3o no banco",
+    "if_doubt": "Notificar Auditoria Institucional",
+    "if_not": "Arquivar como ghost"
+  }
+}
