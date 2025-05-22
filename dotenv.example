@@ -1,0 +1,11 @@
+# Supabase API URL (REST interface)
+SUPABASE_URL=https://zcsbfkatxfwafastugfq.supabase.co
+
+# Supabase Service Role Key (NÃO exponha em frontend)
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpjc2Jma2F0eGZ3YWZhc3R1Z2ZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzkyNzk3NSwiZXhwIjoyMDYzNTAzOTc1fQ.e3nZbGFCa9jL4TR6_PM6lJEWKEd1nz919NIgMGC1Y5Y
+
+# Supabase PostgreSQL direct connection (opcional)
+DATABASE_URL=postgresql://postgres.zcsbfkatxfwafastugfq:vehteb-qirzyr-reMpe9@aws-0-eu-west-2.pooler.supabase.com:6543/postgres
+
+# Caminho local para fallback de logs (formato .jsonl)
+LOG_FALLBACK_PATH=logline.fallback.jsonl
