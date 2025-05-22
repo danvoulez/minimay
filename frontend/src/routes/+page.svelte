@@ -1,41 +1,45 @@
 <script>
-  import { onMount } from 'svelte';
-  let text = '';
-  let feedback = '';
-  let suggestions = [];
+  import LogLineView from '../components/LogLineView.svelte';
+  import CommunicatorView from '../components/CommunicatorView.svelte';
+  import ContracterView from '../components/ContracterView.svelte';
+  import RightMenu from '../components/RightMenu.svelte';
+  import LeftMenu from '../components/LeftMenu.svelte';
 
-  onMount(async () => {
-    const res = await fetch('/prompts');
-    suggestions = await res.json();
-  });
+  let mode = 'logline';
+  let fields = null;
 
-  async function register() {
-    feedback = 'Enviando...';
-    const res = await fetch('/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ this: text, who: 'user', did: 'report', when: new Date().toISOString(), confirmed_by: '', if_ok: '', if_doubt: '', if_not: '', status: 'pending' })
-    });
-    const data = await res.json();
-    feedback = data.status;
-    text = '';
+  function setMode(m) {
+    mode = m;
+  }
+
+  function onRegistered(e) {
+    fields = e.detail.fields;
   }
 </script>
 
-<main>
-  <input list="sug" bind:value={text} placeholder="o que aconteceu?" />
-  <datalist id="sug">
-    {#each suggestions as sug}
-      <option value={sug} />
-    {/each}
-  </datalist>
-  <button on:click={register}>Registrar</button>
-  {#if feedback}
-    <p>{feedback}</p>
-  {/if}
-</main>
+<div class="layout">
+  <LeftMenu {mode} {setMode} />
+  <div class="content">
+    {#if mode === 'logline'}
+      <LogLineView on:registered={onRegistered} />
+    {:else if mode === 'communicator'}
+      <CommunicatorView />
+    {:else}
+      <ContracterView />
+    {/if}
+  </div>
+  <RightMenu {fields} />
+</div>
 
 <style>
-  main { display: flex; flex-direction: column; gap: 0.5rem; max-width: 400px; margin: auto; }
-  input, button { font-size: 1.2rem; }
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+  .content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
