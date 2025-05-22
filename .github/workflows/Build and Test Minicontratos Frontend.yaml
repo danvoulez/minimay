@@ -1,0 +1,35 @@
+name: Build and Test Minicontratos Frontend
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    name: Install & Build Frontend
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: "20"
+
+    - name: Install frontend dependencies
+      working-directory: frontend
+      run: npm install
+
+    - name: Build frontend
+      working-directory: frontend
+      run: npm run build
+
+    - name: Upload build (optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: frontend/build
