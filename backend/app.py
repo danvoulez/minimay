@@ -1,11 +1,25 @@
-from flask import Flask, request, jsonify
-from supabase import create_client, Client
+try:
+    from flask import Flask, request, jsonify
+except Exception:
+    from .flask_fallback import Flask, request, jsonify
+try:
+    from supabase import create_client, Client
+except Exception:  # pragma: no cover
+    create_client = None
+    class Client:  # type: ignore
+        pass
+try:
+    from dotenv import load_dotenv
+except Exception:  # pragma: no cover
+    def load_dotenv():
+        pass
 import json
 import os
 from pathlib import Path
 
 from .llm_service import parse_text_to_logline
 
+load_dotenv()
 app = Flask(__name__)
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -13,7 +27,7 @@ SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 FALLBACK_PATH = Path(os.environ.get('LOG_FALLBACK_PATH', 'logline.voulezvous.jsonl'))
 
 supabase: Client | None = None
-if SUPABASE_URL and SUPABASE_KEY:
+if create_client and SUPABASE_URL and SUPABASE_KEY:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     except Exception:
@@ -50,6 +64,32 @@ def register():
     else:
         save_fallback(logline)
         return jsonify({'status': 'fallback'}), 200
+
+
+@app.route('/prompts', methods=['GET'])
+def get_prompts():
+    path = Path('prompts.extended 2.json')
+    try:
+        with path.open() as f:
+            data = json.load(f)
+    except Exception:
+        data = []
+    return jsonify(data)
+
+
+@app.route('/timeline', methods=['GET'])
+def timeline():
+    if supabase:
+        try:
+            data = supabase.table('loglines').select('*').execute().data
+            return jsonify(data)
+        except Exception:
+            pass
+    if FALLBACK_PATH.exists():
+        with FALLBACK_PATH.open() as f:
+            entries = [json.loads(line) for line in f if line.strip()]
+        return jsonify(entries)
+    return jsonify([])
 
 
 if __name__ == '__main__':
