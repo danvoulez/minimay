@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "build": "make install",
+    "test": "make test",
+    "launch": "make run && cd frontend && npm run dev"
+  }
+}
