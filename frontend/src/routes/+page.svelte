@@ -1,41 +1,14 @@
 <script>
-  import { onMount } from 'svelte';
-  let text = '';
-  let feedback = '';
-  let suggestions = [];
-
-  onMount(async () => {
-    const res = await fetch('/prompts.extended 2.json');
-    suggestions = await res.json();
-  });
-
-  async function register() {
-    feedback = 'Enviando...';
-    const res = await fetch('/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ this: text, who: 'user', did: 'report', when: new Date().toISOString(), confirmed_by: '', if_ok: '', if_doubt: '', if_not: '', status: 'pending' })
-    });
-    const data = await res.json();
-    feedback = data.status;
-    text = '';
-  }
 </script>
 
-<main>
-  <input list="sug" bind:value={text} placeholder="o que aconteceu?" />
-  <datalist id="sug">
-    {#each suggestions as sug}
-      <option value={sug} />
-    {/each}
-  </datalist>
-  <button on:click={register}>Registrar</button>
-  {#if feedback}
-    <p>{feedback}</p>
-  {/if}
-</main>
+<h1>MINICONTRATOS</h1>
+<nav>
+  <a href="/logline">LogLine</a>
+  <a href="/communicator">Communicator</a>
+  <a href="/new">New</a>
+</nav>
 
 <style>
-  main { display: flex; flex-direction: column; gap: 0.5rem; max-width: 400px; margin: auto; }
-  input, button { font-size: 1.2rem; }
+  nav { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+  a { text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; }
 </style>

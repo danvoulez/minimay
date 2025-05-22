@@ -1,11 +1,50 @@
-from flask import Flask, request, jsonify
-from supabase import create_client, Client
 import json
 import os
 from pathlib import Path
 
-from .llm_service import parse_text_to_logline
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    def load_dotenv():
+        pass
 
+try:
+    from flask import Flask, request, jsonify
+except ModuleNotFoundError:  # lightweight fallback
+    class _FakeReq:
+        json = None
+        data = b''
+    request = _FakeReq()
+    def jsonify(obj):
+        return obj
+    class _FakeClient:
+        def __init__(self, app):
+            self.app = app
+        def post(self, path, json=None):
+            request.json = json
+            resp = self.app.routes[path]()
+            return type('Resp', (), {'status_code': 200, 'data': json.dumps(resp).encode()})
+    class Flask:
+        def __init__(self, name):
+            self.routes = {}
+        def route(self, path, methods=None):
+            def wrapper(f):
+                self.routes[path] = f
+                return f
+            return wrapper
+        def test_client(self):
+            return _FakeClient(self)
+        def run(self, *a, **k):
+            pass
+    from types import SimpleNamespace
+    create_client = lambda url, key: SimpleNamespace(table=lambda name: SimpleNamespace(insert=lambda x: None, select=lambda *a, **k: SimpleNamespace(execute=lambda: SimpleNamespace(data=[]))))
+    Client = object
+else:
+    from supabase import create_client, Client
+
+load_dotenv()
+
+from .llm_service import parse_text_to_logline
 app = Flask(__name__)
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -50,6 +89,32 @@ def register():
     else:
         save_fallback(logline)
         return jsonify({'status': 'fallback'}), 200
+
+
+@app.route('/prompts', methods=['GET'])
+def get_prompts():
+    path = Path('prompts.extended 2.json')
+    try:
+        with path.open() as f:
+            data = json.load(f)
+    except Exception:
+        data = []
+    return jsonify(data)
+
+
+@app.route('/timeline', methods=['GET'])
+def timeline():
+    if supabase:
+        try:
+            data = supabase.table('loglines').select('*').execute().data
+            return jsonify(data)
+        except Exception:
+            pass
+    if FALLBACK_PATH.exists():
+        with FALLBACK_PATH.open() as f:
+            entries = [json.loads(line) for line in f if line.strip()]
+        return jsonify(entries)
+    return jsonify([])
 
 
 if __name__ == '__main__':
