@@ -5,4 +5,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 if [ -d frontend ]; then
   cd frontend && npm install || true
+  cd ..
 fi
+mkdir -p logs data
