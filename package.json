@@ -4,7 +4,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "svelte-kit dev",
+    "build:svelte": "svelte-kit build",
+    "preview:svelte": "svelte-kit preview"
   },
   "devDependencies": {
     "@sveltejs/kit": "next",
