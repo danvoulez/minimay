@@ -12,3 +12,13 @@ def parse_text_to_logline(text: str) -> dict:
         'status': parts[8].strip() if len(parts) > 8 else 'pending'
     }
     return logline
+
+
+def interpretar_frase(frase: str) -> dict:
+    """Alias semântico para `parse_text_to_logline`.
+
+    A função original continua existindo para compatibilidade
+    com os testes, mas o sistema pode invocar este nome mais
+    descritivo conforme definido nos prompts institucionais.
+    """
+    return parse_text_to_logline(frase)
